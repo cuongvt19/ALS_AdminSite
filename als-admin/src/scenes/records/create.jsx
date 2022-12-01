@@ -85,7 +85,7 @@ const CreateRecordForm = () => {
     console.log(textValueState);
     const result = await textToSpeechAsync(textValueState);
     console.log(result.data);
-    await delay(5000);
+    await delay(10000);
     console.log(result.data.async);
     // const audioRef = ref(storage, `upload-voice-firebase/`);
     // uploadBytes(audioRef, result.data.async).then(() => {
@@ -181,7 +181,7 @@ const CreateRecordForm = () => {
                 inputProps={{ style: { fontSize: 20 } }}
                 variant="filled"
                 type="text"
-                label="Text"
+                label="Content"
                 onBlur={handleBlur}
                 onChange={(e) => {
                   handleChange(e);

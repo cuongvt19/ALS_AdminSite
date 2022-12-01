@@ -6,10 +6,13 @@ import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
 import { createArticleAsync } from "../../services/articlesServices";
+import { storage } from "../../firebase";
+import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
+import { v4 } from "uuid";
 
 const userSchema = yup.object().shape({
   title: yup.string().required("Title is required"),
-  image: yup.string().required("Image is required"),
+  // image: yup.string().required("Image is required"),
   description: yup.string().required("Description is required"),
 });
 
@@ -26,32 +29,59 @@ const CreateArticleForm = () => {
 
     const [isSuccess, setIsSuccess] = useState();
     const [imageState, setImageState] = useState();
+    const [uploadImage, setUploadImage] = useState();
 
     const isNonMobile = useMediaQuery("(min-width:600px)");
 
     const handleFormSubmit = async (values) => {
-        console.log(values);
-        const requestBody = {values}
-        console.log(requestBody);
-        const response = await createArticleAsync(requestBody);
-        setIsSuccess(response.data.success);
-    }
+      console.log(values);
+      const fileName = uploadImage.name.substring(
+        0,
+        uploadImage.name.lastIndexOf(".")
+      );
+      let imageUrl = "";
+      const imageRef = ref(storage, `upload-image-firebase/${fileName + v4()}`);
+      console.log(imageRef);
+      console.log(uploadImage);
+      uploadBytes(imageRef, uploadImage).then(async () => {
+        console.log("uploaded");
+        getDownloadURL(imageRef).then(async (url) => {
+          console.log(url);
+          imageUrl = url;
+          console.log(values);
+          const requestBody = {
+            image: imageUrl,
+            ...values,
+          };
+          console.log(requestBody);
+          const response = await createArticleAsync(requestBody);
+          setIsSuccess(response.data.success);
+        });
+      });
+      // console.log(values);
+      // const requestBody = { values };
+      // console.log(requestBody);
+      // const response = await createArticleAsync(requestBody);
+      // setIsSuccess(response.data.success);
+    };
 
     const alertCloseHandle = () => {
         setIsSuccess(false);
         navigate("/articles");
     }
 
-    const handleImageChange = (changeImage) => {
-      console.log(changeImage);
-      if (imageState === null || imageState !== changeImage) {
-        setImageState(changeImage);
+    const handleImageChange = (event) => {
+      if (event.target.files && event.target.files[0]) {
+        let reader = new FileReader();
+        reader.onload = (e) => {
+          // this.setState({image: e.target.result});
+          setImageState(e.target.result);
+        };
+        reader.readAsDataURL(event.target.files[0]);
       }
-      console.log(imageState);
     }
-
     useEffect(() => {
-      console.log(imageState);
+      // console.log(imageState);
     }, [imageState])
 
     useEffect(() =>  {
@@ -74,7 +104,12 @@ const CreateArticleForm = () => {
         <Header title="CREATE ARTICLE" subtitle="Create an Article" />
 
         <Box>
-          <img alt="Article Image" src={imageState} height="400px" maxWidth="1000px" />
+            <img
+              alt="Article Image"
+              src={imageState}
+              height="400px"
+              maxWidth="1000px"
+            />
         </Box>
 
         <Formik
@@ -119,7 +154,7 @@ const CreateArticleForm = () => {
                   helperText={touched.title && errors.title}
                   sx={{ gridColumn: "span 4" }}
                 />
-                <TextField
+                {/* <TextField
                   fullWidth
                   inputProps={{ style: { fontSize: 20 } }}
                   variant="filled"
@@ -135,7 +170,7 @@ const CreateArticleForm = () => {
                   error={!!touched.image && !!errors.image}
                   helperText={touched.image && errors.image}
                   sx={{ gridColumn: "span 4" }}
-                />
+                /> */}
                 <TextField
                   multiline
                   fullWidth
@@ -159,6 +194,15 @@ const CreateArticleForm = () => {
                   sx={{ gridColumn: "span 4" }}
                 />
               </Box>
+              <input
+                name="imageFile"
+                type="file"
+                onChange={(e) => {
+                  handleChange(e);
+                  setUploadImage(e.currentTarget.files[0]);
+                  handleImageChange(e);
+                }}
+              />
               <Box display="flex" justifyContent="end" mt="20px">
                 <Button
                   type="submit"
