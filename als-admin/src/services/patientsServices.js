@@ -7,9 +7,9 @@ export const getAllPatientsAsync = async () => {
     return await axios.get(GET_PATIENT_URL);
 }
 
-export const deletePatientAsync = async (patientId) => {
-    console.log(patientId);
-    console.log(DELETE_PATIENT_URL + patientId);
-    const patient = {status: false};
+export const toggleStatusPatientAsync = async (patientId, status) => {
+    // console.log(patientId);
+    // console.log(DELETE_PATIENT_URL + patientId);
+    const patient = {status: status};
     return await axios.put(DELETE_PATIENT_URL + patientId, patient);
 }

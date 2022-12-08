@@ -192,7 +192,7 @@ const AppSidebar = () => {
               selected={selected}
               setSelected={setSelected}
             />
-            <Typography
+            {/* <Typography
               variant="h5"
               color={colors.grey[300]}
               sx={{ m: "15px 0 5px 20px" }}
@@ -200,7 +200,7 @@ const AppSidebar = () => {
               Pages
             </Typography>
             <Item
-              title="Create User"
+              title="Create Staff"
               to="/createStaff"
               icon={<PersonOutlineOutlinedIcon fontSize="large"/>}
               selected={selected}
@@ -226,7 +226,7 @@ const AppSidebar = () => {
               icon={<KeyboardVoiceOutlinedIcon fontSize="large"/>}
               selected={selected}
               setSelected={setSelected}
-            />
+            /> */}
           </Box>
         </Menu>
       </ProSidebar>

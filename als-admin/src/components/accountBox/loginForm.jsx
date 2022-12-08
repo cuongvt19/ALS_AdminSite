@@ -24,7 +24,8 @@ export function LoginForm(props) {
 
   const navigate = useNavigate();
   const location = useLocation();
-  const from = location.state?.from?.pathname || "/";
+  // const from = location.state?.from?.pathname || "/";
+  const from = "/";
 
   const onSubmit = async (values) => {
     //console.log(values);

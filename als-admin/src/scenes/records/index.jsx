@@ -196,6 +196,18 @@ const Records = () => {
           title="RECORDS"
           subtitle="Managing the voice records created by Admin"
         />
+        <Button
+          onClick={() => {
+            navigate("/createRecord");
+          }}
+          style={{
+            backgroundColor: "#055CED",
+          }}
+          variant="contained"
+          size="large"
+        >
+          Create New Record
+        </Button>
       </Box>
       <Box
         m="40px 0 0 0"

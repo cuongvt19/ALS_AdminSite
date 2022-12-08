@@ -138,16 +138,22 @@ const CreateExerciseForm = () => {
         }) => (
           <form onSubmit={handleSubmit}>
             <Box
-              display="grid"
+              display="flex"
               gap="30px"
-              gridTemplateColumns="repeat(4, minmax(0.5fr, 1fr))"
+              // gridTemplateColumns="repeat(1, minmax(0.5fr, 0.5fr))"
+              flexDirection="column"
               sx={{
-                "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+                "& > div": { gridColumn: isNonMobile ? undefined : "span 1" },
               }}
+              // maxWidth="1000px"
+              // alignSelf="center"
+              justifyContent="center"
+              // alignItems="center"
+              width="700px"
             >
               <TextField
                 fullWidth
-                inputProps={{ style: { fontSize: 20 } }}
+                inputProps={{ style: { fontSize: 20, } }}
                 variant="filled"
                 type="text"
                 label="Exercise Name"
@@ -157,7 +163,7 @@ const CreateExerciseForm = () => {
                 name="exerciseName"
                 error={!!touched.exerciseName && !!errors.exerciseName}
                 helperText={touched.exerciseName && errors.exerciseName}
-                sx={{ gridColumn: "span 4" }}
+                sx={{ gridColumn: "span 1" }}
               />
               <TextField
                 fullWidth
@@ -171,7 +177,7 @@ const CreateExerciseForm = () => {
                 name="videoLink"
                 error={!!touched.videoLink && !!errors.videoLink}
                 helperText={touched.videoLink && errors.videoLink}
-                sx={{ gridColumn: "span 4" }}
+                sx={{ gridColumn: "span 1" }}
               />
               <TextField
                 fullWidth
@@ -185,7 +191,7 @@ const CreateExerciseForm = () => {
                 name="description"
                 error={!!touched.description && !!errors.description}
                 helperText={touched.description && errors.description}
-                sx={{ gridColumn: "span 4" }}
+                sx={{ gridColumn: "span 1" }}
               />
               {/* <TextField
                   fullWidth
@@ -236,7 +242,7 @@ const CreateExerciseForm = () => {
                   <option value={3}>Tap ay</option>
                 </Field> */}
             </Box>
-            <Box display="flex" justifyContent="end" mt="20px">
+            <Box display="flex" justifyContent="start" mt="20px">
               <Button
                 type="submit"
                 color="secondary"

@@ -7,9 +7,9 @@ export const getAllSupportersAsync = async () => {
     return await axios.get(GET_SUPPORTER_URL);
 }
 
-export const deleteSupporterAsync = async (supporterId) => {
-    console.log(supporterId);
-    console.log(DELETE_SUPPORTER_URL + supporterId);
-    const supporter = {status: false};
+export const toggleStatusSupporterAsync = async (supporterId, status) => {
+    // console.log(supporterId);
+    // console.log(DELETE_SUPPORTER_URL + supporterId);
+    const supporter = {status: status};
     return await axios.put(DELETE_SUPPORTER_URL + supporterId, supporter);
 }

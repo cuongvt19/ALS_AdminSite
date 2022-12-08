@@ -221,6 +221,18 @@ const Exercises = () => {
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="EXERCISEES" subtitle="Managing the exercises" />
+        <Button
+          onClick={() => {
+            navigate("/createExercise");
+          }}
+          style={{
+            backgroundColor: "#055CED",
+          }}
+          variant="contained"
+          size="large"
+        >
+          Create New Exercise
+        </Button>
       </Box>
       <Box
         m="40px 0 0 0"

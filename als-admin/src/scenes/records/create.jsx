@@ -85,16 +85,16 @@ const CreateRecordForm = () => {
     console.log(textValueState);
     const result = await textToSpeechAsync(textValueState);
     console.log(result.data);
-    await delay(10000);
+    await delay(12000);
     console.log(result.data.async);
     // const audioRef = ref(storage, `upload-voice-firebase/`);
     // uploadBytes(audioRef, result.data.async).then(() => {
     //   console.log("uploaded");
     // });
-    let a = document.createElement("a");
-    a.href = result.data.async;
-    a.download = "";
-    a.click(console.log("clicked"));
+    // let a = document.createElement("a");
+    // a.href = result.data.async;
+    // a.download = "";
+    // a.click(console.log("clicked"));
     // let convertedAudioDataObj = await AudioConverter.convert(result.data.async, 'aac');
     // console.log(convertedAudioDataObj);
     // console.log(convertedAudioDataObj.data);
@@ -111,6 +111,43 @@ const CreateRecordForm = () => {
     console.log(textValue);
     setTextValueState(textValue);
     setLinkAudioState("");
+  };
+
+  const downloadAudioFileHandle = () => {
+    const link = document.createElement("a");
+    link.href = linkAudioState;
+    // link.setAttribute("download", `FileName.pdf`);
+
+    // Append to html link element page
+    document.body.appendChild(link);
+
+    link.download = "";
+
+    // Start download
+    link.click();
+
+    // Clean up and remove the link
+    link.parentNode.removeChild(link);
+    // fetch(linkAudioState)
+    //   .then((response) => response.blob())
+    //   .then((blob) => {
+    //     // Create blob link to download
+    //     const url = window.URL.createObjectURL(new Blob([blob]));
+    //     const link = document.createElement("a");
+    //     link.href = url;
+    //     // link.setAttribute("download", `FileName.pdf`);
+
+    //     // Append to html link element page
+    //     document.body.appendChild(link);
+
+    //     link.download="";
+
+    //     // Start download
+    //     link.click();
+
+    //     // Clean up and remove the link
+    //     link.parentNode.removeChild(link);
+    //   });
   };
 
   // const handleImageChange = (changeImage) => {
@@ -146,7 +183,7 @@ const CreateRecordForm = () => {
 
       {linkAudioState !== "" && (
         // <Delayed waitBeforeShow={5000}>
-          <audio src={linkAudioState} controls="controls"></audio>
+        <audio src={linkAudioState} controls="controls"></audio>
         // </Delayed>
       )}
 
@@ -169,12 +206,24 @@ const CreateRecordForm = () => {
         }) => (
           <form onSubmit={handleSubmit}>
             <Box
-              display="grid"
+              // display="grid"
+              // gap="30px"
+              // gridTemplateColumns="repeat(4, minmax(0.5fr, 1fr))"
+              // sx={{
+              //   "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+              // }}
+              display="flex"
               gap="30px"
-              gridTemplateColumns="repeat(4, minmax(0.5fr, 1fr))"
+              // gridTemplateColumns="repeat(1, minmax(0.5fr, 0.5fr))"
+              flexDirection="column"
               sx={{
-                "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+                "& > div": { gridColumn: isNonMobile ? undefined : "span 1" },
               }}
+              // maxWidth="1000px"
+              // alignSelf="center"
+              justifyContent="center"
+              // alignItems="center"
+              width="700px"
             >
               <TextField
                 fullWidth
@@ -216,13 +265,18 @@ const CreateRecordForm = () => {
                 />
               )}
               {linkAudioState !== "" && (
-                <input name="audioFile" type="file" onChange={(e) => {
-                  handleChange(e);
-                  setUploadAudio(e.currentTarget.files[0]);
-                }}/>
+                <input
+                  name="audioFile"
+                  type="file"
+                  onChange={(e) => {
+                    handleChange(e);
+                    setUploadAudio(e.currentTarget.files[0]);
+                  }}
+                />
               )}
             </Box>
-            <Box display="flex" justifyContent="end" mt="20px">
+            <Box display="flex" justifyContent="start" mt="20px">
+              {linkAudioState === "" && (
                 <Button
                   type="action"
                   color="secondary"
@@ -233,6 +287,7 @@ const CreateRecordForm = () => {
                 >
                   Text To Speech
                 </Button>
+              )}
               {linkAudioState !== "" && (
                 <Button
                   type="submit"
@@ -242,6 +297,18 @@ const CreateRecordForm = () => {
                   sx={{ margin: "10px" }}
                 >
                   Create Record
+                </Button>
+              )}
+              {linkAudioState !== "" && (
+                <Button
+                  type="action"
+                  color="secondary"
+                  variant="contained"
+                  size="large"
+                  sx={{ margin: "10px" }}
+                  onClick={() => downloadAudioFileHandle()}
+                >
+                  Download Audio
                 </Button>
               )}
               {/* {linkAudioState !== "" && (

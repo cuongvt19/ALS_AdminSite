@@ -238,6 +238,18 @@ const Articles = () => {
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="ARTICLES" subtitle="Managing the aticles" />
+        <Button
+          onClick={() => {
+            navigate("/createArticle");
+          }}
+          style={{
+            backgroundColor: "#055CED",
+          }}
+          variant="contained"
+          size="large"
+        >
+          Create New Article
+        </Button>
       </Box>
       <Box
         m="40px 0 0 0"

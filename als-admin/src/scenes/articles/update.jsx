@@ -42,39 +42,56 @@ const UpdateArticleForm = () => {
     const isNonMobile = useMediaQuery("(min-width:600px)");
 
     const handleFormSubmit = async (values) => {
-      console.log(values);
-      const fileName = uploadImage.name.substring(
-        0,
-        uploadImage.name.lastIndexOf(".")
-      );
-      let imageUrl = "";
-      const imageRef = ref(storage, `upload-image-firebase/${fileName + v4()}`);
-      console.log(imageRef);
-      console.log(uploadImage);
-      uploadBytes(imageRef, uploadImage).then(async () => {
-        console.log("uploaded");
-        getDownloadURL(imageRef).then(async (url) => {
-          console.log(url);
-          imageUrl = url;
-          console.log(values);
-          const requestBody = {
-            newsId: newsId,
-            status: status,
-            lastModifyBy: lastModifyBy,
-            image: imageUrl,
-            ...values,
-          };
-          console.log(requestBody);
-          const response = await updateArticleAsync(requestBody);
-          setIsSuccess(response.data.success);
+      if (uploadImage != null) {
+        console.log(values);
+        const fileName = uploadImage.name.substring(
+          0,
+          uploadImage.name.lastIndexOf(".")
+        );
+        let imageUrl = "";
+        const imageRef = ref(
+          storage,
+          `upload-image-firebase/${fileName + v4()}`
+        );
+        console.log(imageRef);
+        console.log(uploadImage);
+        uploadBytes(imageRef, uploadImage).then(async () => {
+          console.log("uploaded");
+          getDownloadURL(imageRef).then(async (url) => {
+            console.log(url);
+            imageUrl = url;
+            console.log(values);
+            const requestBody = {
+              newsId: newsId,
+              status: status,
+              lastModifyBy: lastModifyBy,
+              image: imageUrl,
+              ...values,
+            };
+            console.log(requestBody);
+            const response = await updateArticleAsync(requestBody);
+            setIsSuccess(response.data.success);
+          });
         });
-      });
-    }
+      } else {
+        console.log(values);
+        const requestBody = {
+          newsId: newsId,
+          status: status,
+          lastModifyBy: lastModifyBy,
+          image: imageState,
+          ...values,
+        };
+        console.log(requestBody);
+        const response = await updateArticleAsync(requestBody);
+        setIsSuccess(response.data.success);
+      }
+    };
 
     const alertCloseHandle = () => {
-        setIsSuccess(false);
-        navigate("/articles");
-    }
+      setIsSuccess(false);
+      navigate("/articles");
+    };
 
     const handleImageChange = (event) => {
       if (event.target.files && event.target.files[0]) {

@@ -8,6 +8,7 @@ import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
 import SwipeableTemporaryDrawer from "./ViewUserDrawer";
 import { getAllStaffsAsync, toggleStaffStatusAsync } from "../../services/staffsServices";
+import { useNavigate } from "react-router-dom";
 
 const Staffs = () => {
   const theme = useTheme();
@@ -17,6 +18,8 @@ const Staffs = () => {
   const [listSupporters, setListSupporters] = useState({});
   const [visibleUserDrawer, setVisibleUserDrawer] = useState(false);
   const [activeRows, setActiveRows] = useState({});
+
+  let navigate = useNavigate();
 
   const getStaffs = async () => {
     const staffs = await getAllStaffsAsync();
@@ -179,6 +182,18 @@ const Staffs = () => {
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header title="SUPPORTERS" subtitle="Managing the ALS supporters" />
+        <Button
+          onClick={() => {
+            navigate("/createStaff");
+          }}
+          style={{
+            backgroundColor: "#055CED",
+          }}
+          variant="contained"
+          size="large"
+        >
+          Create New Staff
+        </Button>
       </Box>
       <Box
         m="40px 0 0 0"

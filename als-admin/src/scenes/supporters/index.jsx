@@ -7,7 +7,7 @@ import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
 import SwipeableTemporaryDrawer from "./ViewUserDrawer";
-import { getAllSupportersAsync, deleteSupporterAsync } from "../../services/supportersServices";
+import { getAllSupportersAsync, toggleStatusSupporterAsync } from "../../services/supportersServices";
 
 const Supporters = () => {
   const theme = useTheme();
@@ -25,7 +25,7 @@ const Supporters = () => {
     if (supporters.data) {
       setListSupporters(supporters.data);
       const rows = supporters.data
-        .filter((row) => row.status !== false)
+        // .filter((row) => row.status !== false)
         .map((item, i) => {
           return {
             ...item,
@@ -47,7 +47,7 @@ const Supporters = () => {
 
   const deleteRow = async (row) => {
     //console.log(row.userId);
-    await deleteSupporterAsync(row.userId);
+    await toggleStatusSupporterAsync(row.userId, !row.status);
     getSupporters();
   }
 
@@ -91,6 +91,25 @@ const Supporters = () => {
       headerName: "Address",
       flex: 1,
     },
+    {
+      field: "statusPatient",
+      headerName: "Status",
+      renderCell: ({ row: { status } }) => {
+        if (status === true) {
+          return (
+            <Typography color={colors.greenAccent[500]} sx={{ ml: "5px" }}>
+              Active
+            </Typography>
+          );
+        } else {
+          return(
+            <Typography color={colors.redAccent[500]} sx={{ ml: "5px" }}>
+              Banned
+            </Typography>
+          );
+        }
+      },
+    },
   ];
 
   const actionColumn = [
@@ -104,7 +123,7 @@ const Supporters = () => {
           setViewUserData(currentRow);
           setVisibleUserDrawer(true);
         };
-        const handleDelete = (e) => {
+        const handleToggle = (e) => {
           const currentRow = params.row;
           deleteRow(currentRow);
         }
@@ -142,27 +161,51 @@ const Supporters = () => {
                         View
                       </Button>
                     </Box> */}
-            <Box
-              width="60%"
-              m="0 auto"
-              p="0px"
-              display="flex"
-              justifyContent="center"
-              backgroundColor={colors.redAccent[600]}
-              borderRadius="4px"
-              alignContent="center"
-            >
-              <Button
-                onClick={handleDelete}
-                style={{
-                  backgroundColor: "#C60000",
-                }}
-                variant="contained"
-                size="small"
+            {params.row.status === true ? (
+              <Box
+                width="60%"
+                m="0 auto"
+                p="0px"
+                display="flex"
+                justifyContent="center"
+                backgroundColor={colors.redAccent[600]}
+                borderRadius="4px"
+                alignContent="center"
               >
-                Delete
-              </Button>
-            </Box>
+                <Button
+                  onClick={handleToggle}
+                  style={{
+                    backgroundColor: "#C60000",
+                  }}
+                  variant="contained"
+                  size="small"
+                >
+                  Ban
+                </Button>
+              </Box>
+            ) : (
+              <Box
+                width="60%"
+                m="0 auto"
+                p="0px"
+                display="flex"
+                justifyContent="center"
+                backgroundColor={colors.redAccent[600]}
+                borderRadius="4px"
+                alignContent="center"
+              >
+                <Button
+                  onClick={handleToggle}
+                  style={{
+                    backgroundColor: "#dab600",
+                  }}
+                  variant="contained"
+                  size="small"
+                >
+                  Unban
+                </Button>
+              </Box>
+            )}
           </Box>
         );
       },
