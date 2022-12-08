@@ -49,8 +49,10 @@ const CreateArticleForm = () => {
           console.log(url);
           imageUrl = url;
           console.log(values);
+          console.log(imageUrl);
           const requestBody = {
-            image: imageUrl,
+            image: url,
+            accessId: 3,
             ...values,
           };
           console.log(requestBody);
@@ -117,7 +119,6 @@ const CreateArticleForm = () => {
           enableReinitialize
           initialValues={{
             title: "",
-            image: "",
             description: "",
           }}
           validationSchema={userSchema}
@@ -166,23 +167,6 @@ const CreateArticleForm = () => {
                   helperText={touched.title && errors.title}
                   sx={{ gridColumn: "span 4" }}
                 />
-                {/* <TextField
-                  fullWidth
-                  inputProps={{ style: { fontSize: 20 } }}
-                  variant="filled"
-                  type="text"
-                  label="Image Link"
-                  onBlur={handleBlur}
-                  onChange={(e) => {
-                    handleChange(e);
-                    handleImageChange(e.currentTarget.value);
-                  }}
-                  value={values.image}
-                  name="image"
-                  error={!!touched.image && !!errors.image}
-                  helperText={touched.image && errors.image}
-                  sx={{ gridColumn: "span 4" }}
-                /> */}
                 <TextField
                   multiline
                   fullWidth

@@ -162,12 +162,24 @@ const UpdateArticleForm = () => {
           }) => (
             <form onSubmit={handleSubmit}>
               <Box
-                display="grid"
+                // display="grid"
+                // gap="30px"
+                // gridTemplateColumns="repeat(4, minmax(0.5fr, 1fr))"
+                // sx={{
+                //   "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+                // }}
+                display="flex"
                 gap="30px"
-                gridTemplateColumns="repeat(4, minmax(0.5fr, 1fr))"
+                // gridTemplateColumns="repeat(1, minmax(0.5fr, 0.5fr))"
+                flexDirection="column"
                 sx={{
-                  "& > div": { gridColumn: isNonMobile ? undefined : "span 4" },
+                  "& > div": { gridColumn: isNonMobile ? undefined : "span 1" },
                 }}
+                // maxWidth="1000px"
+                // alignSelf="center"
+                justifyContent="center"
+                // alignItems="center"
+                width="700px"
               >
                 <TextField
                   fullWidth
@@ -228,7 +240,7 @@ const UpdateArticleForm = () => {
                   setUploadImage(e.currentTarget.files[0]);
                   handleImageChange(e);
                 }}/>
-              <Box display="flex" justifyContent="end" mt="20px">
+              <Box display="flex" justifyContent="start" mt="20px">
                 <Button
                   type="submit"
                   color="secondary"
