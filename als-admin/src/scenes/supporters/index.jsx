@@ -61,7 +61,7 @@ const Supporters = () => {
   }, []);
 
   const columns = [
-    { field: "rowIndex", headerName: "No.", flex: 0.5 },
+    { field: "rowIndex", headerName: "No.", flex: 0.3,  align: "center", headerAlign: "center"},
     {
       field: "fullName",
       headerName: "Name",

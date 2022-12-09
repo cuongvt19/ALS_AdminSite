@@ -70,7 +70,7 @@ const Exercises = () => {
   }, []);
 
   const columns = [
-    { field: "rowIndex", headerName: "No.", flex: 0.5 },
+    { field: "rowIndex", headerName: "No.", flex: 0.3,  align: "center", headerAlign: "center"},
     {
       field: "exerciseName",
       headerName: "Name",

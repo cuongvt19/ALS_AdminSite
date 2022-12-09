@@ -83,7 +83,7 @@ const Posts = () => {
   }, []);
 
   const columns = [
-    { field: "rowIndex", headerName: "No.", flex: 0.3 },
+    { field: "rowIndex", headerName: "No.", flex: 0.3,  align: "center", headerAlign: "center"},
     {
       field: "postId",
       headerName: "PostId",
