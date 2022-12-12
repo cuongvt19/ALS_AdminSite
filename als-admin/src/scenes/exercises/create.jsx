@@ -9,85 +9,77 @@ import {
   getAllCategoriesAsync,
   createExerciseAsync
 } from "../../services/exercisesServices";
-//import { useLocation } from "react-router-dom";
 import { fontSize } from "@mui/system";
+import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
+import { storage } from "../../firebase";
+import { v4 } from "uuid";
 
-const initialValues = {
-  exerciseName: "",
-  videoLink: "",
-  description: "",
-  categoryId: "",
-};
 
 const userSchema = yup.object().shape({
   exerciseName: yup.string().required("Exercise Name is required"),
-  //   email: yup
-  //     .string()
-  //     .email("Invalid email format")
-  //     .required("Email is required"),
   videoLink: yup.string().required("Video Link is required"),
   description: yup.string().required("Description is required"),
   categoryId: yup.string().required("Category is required"),
-  //   confirmPassword: yup
-  //     .string()
-  //     .required("Password Confirmation is required")
-  //     .test("passwords-match", "Passwords must match", function (value) {
-  //       return this.parent.password === value;
-  //     }),
+  exerciseLevel: yup.string().required("Difficulty is required"),
 });
 
 const CreateExerciseForm = () => {
   let navigate = useNavigate();
 
-  //const location = useLocation();
-
-  //let exerciseId = location.state.exerciseId;
-  // let exerciseName = location.state.exerciseName;
-  // let videoLink = location.state.videoLink;
-  // let description = location.state.description;
-  // let categoryName = location.state.categoryName;
-
   const [categories, setCategories] = useState([]);
-  // const [categoryIdState, setCategoryIdState] = useState("");
   const [isSuccess, setIsSuccess] = useState();
-  // const [exerciseId, setExerciseId] = useState();
-  // const [exerciseName, setExerciseName] = useState();
-  // const [videoLink, setVideoLink] = useState();
-  // const [description, setDescription] = useState();
-  // const [categoryName, setCategoryName] = useState();
+  const [imageState, setImageState] = useState();
+  const [uploadImage, setUploadImage] = useState();
+  const [iniCategoryId, setInitCategoryId] = useState();
 
   const isNonMobile = useMediaQuery("(min-width:600px)");
 
   const handleFormSubmit = async (values) => {
     console.log(values);
-    const requestBody = {
-      //exerciseId: exerciseId,
-      exerciseName: values.exerciseName,
-      videoLink: values.videoLink,
-      description: values.description,
-      categoryId: values.categoryId,
-    };
-    console.log(requestBody);
-    const response = await createExerciseAsync(requestBody);
-    setIsSuccess(response.data.success);
-    // console.log(exerciseName);
-    // console.log(videoLink);
+    const fileName = uploadImage.name.substring(
+      0,
+      uploadImage.name.lastIndexOf(".")
+    );
+    let imageUrl = "";
+    const imageRef = ref(storage, `upload-image-firebase/${fileName + v4()}`);
+    console.log(imageRef);
+    console.log(uploadImage);
+    uploadBytes(imageRef, uploadImage).then(async () => {
+      console.log("uploaded");
+      getDownloadURL(imageRef).then(async (url) => {
+        console.log(url);
+        imageUrl = url;
+        console.log(values);
+        console.log(imageUrl);
+        const requestBody = {
+          exerciseImage: imageUrl,
+          exerciseName: values.exerciseName,
+          videoLink: values.videoLink,
+          description: values.description,
+          categoryId: values.categoryId,
+        };
+        console.log(requestBody);
+        const response = await createExerciseAsync(requestBody);
+        console.log(response);
+        setIsSuccess(response.data.success);
+      });
+    });
+
+    // console.log(values);
+    // const requestBody = {
+    //   exerciseName: values.exerciseName,
+    //   videoLink: values.videoLink,
+    //   description: values.description,
+    //   categoryId: values.categoryId,
+    // };
+    // console.log(requestBody);
+    // const response = await createExerciseAsync(requestBody);
+    // setIsSuccess(response.data.success);
   };
 
   const getCategories = async () => {
-    // console.log(exerciseName);
-    // console.log(videoLink);
-    // console.log(description);
-    // console.log(categoryName);
     const response = await getAllCategoriesAsync();
-    // console.log(response.data);
     setCategories(response.data);
-    // const categoryId = response.data.find(
-    //   (cat) => cat.catgegoryName === categoryName
-    // ).categoryId;
-    // console.log(categoryId);
-    // setCategoryIdState(categoryId);
-    // console.log(categoryIdState);
   };
 
   const alertCloseHandle = () => {
@@ -95,13 +87,27 @@ const CreateExerciseForm = () => {
     navigate("/exercises");
   };
 
+  const handleImageChange = (event) => {
+    if (event.target.files && event.target.files[0]) {
+      let reader = new FileReader();
+      reader.onload = (e) => {
+        setImageState(e.target.result);
+      };
+      reader.readAsDataURL(event.target.files[0]);
+    }
+  }
+
+  useEffect(() => {
+  }, [imageState]);
+
+  useEffect(() => {
+    if(categories.length > 0) {
+      setInitCategoryId(categories[0].categoryNewId);
+    }
+  }, [categories]);
+
   useEffect(() => {
     getCategories();
-    //   setExerciseId(location.state?.exerciseId);
-    //   setExerciseName(location.state?.exerciseName);
-    //   setVideoLink(location.state?.videoLink);
-    //   setDescription(location.state?.description);
-    //   setCategoryName(location.state?.categoryName);
   }, []);
 
   return (
@@ -119,11 +125,23 @@ const CreateExerciseForm = () => {
       )}
       <Header title="CREATE EXERCISE" subtitle="Create a new Exercise" />
 
+      <Box>
+        <img
+          alt="Article Image"
+          src={imageState}
+          height="400px"
+          maxWidth="1000px"
+        />
+      </Box>
+
       <Formik
         onSubmit={handleFormSubmit}
         enableReinitialize
         initialValues={{
-          initialValues,
+          exerciseName: "",
+          videoLink: "",
+          description: "",
+          categoryId: iniCategoryId ?? "",
         }}
         validationSchema={userSchema}
       >
@@ -153,7 +171,7 @@ const CreateExerciseForm = () => {
             >
               <TextField
                 fullWidth
-                inputProps={{ style: { fontSize: 20, } }}
+                inputProps={{ style: { fontSize: 20 } }}
                 variant="filled"
                 type="text"
                 label="Exercise Name"
@@ -193,54 +211,35 @@ const CreateExerciseForm = () => {
                 helperText={touched.description && errors.description}
                 sx={{ gridColumn: "span 1" }}
               />
-              {/* <TextField
-                  fullWidth
-                  inputProps={{ style: { fontSize: 20 } }}
-                  variant="filled"
-                  type="password"
-                  label="Passowrd"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.password}
-                  name="password"
-                  error={!!touched.password && !!errors.password}
-                  helperText={touched.password && errors.password}
-                  sx={{ gridColumn: "span 4" }}
-                /> */}
-              {/* <TextField
-                  fullWidth
-                  inputProps={{style: {fontSize: 20}}}
-                  variant="filled"
-                  type="password"
-                  label="Confirm Password"
-                  onBlur={handleBlur}
-                  onChange={handleChange}
-                  value={values.confirmPassword}
-                  name="confirmPassword"
-                  error={!!touched.confirmPassword && !!errors.confirmPassword}
-                  helperText={touched.confirmPassword && errors.confirmPassword}
-                  sx={{ gridColumn: "span 4" }}
-                /> */}
-              <Field
-                as="select"
-                name="categoryId"
+              <TextField
                 fullWidth
-              >
-                {/* <option disabled value={categoryIdState}>
-                    {categoryName}
-                  </option> */}
-                {/* {categories && */}
-                {categories
-                  //   .filter((cate) => cate.id !== props.values.player2)
-                  .map((cat) => (
-                    <option value={cat.categoryId}>{cat.catgegoryName}</option>
-                  ))}
+                inputProps={{ style: { fontSize: 20 } }}
+                variant="filled"
+                type="text"
+                label="Difficulty"
+                onBlur={handleBlur}
+                onChange={handleChange}
+                value={values.exerciseLevel}
+                name="exerciseLevel"
+                error={!!touched.exerciseLevel && !!errors.exerciseLevel}
+                helperText={touched.exerciseLevel && errors.exerciseLevel}
+                sx={{ gridColumn: "span 1" }}
+              />
+              <Field as="select" name="categoryId" fullWidth>
+                {categories.map((cat) => (
+                  <option value={cat.categoryId}>{cat.catgegoryName}</option>
+                ))}
               </Field>
-              {/* <Field as="select" name="categoryId">
-                  <option value={1}>Tap tay</option>
-                  <option value={2}>Tap ta</option>
-                  <option value={3}>Tap ay</option>
-                </Field> */}
+
+              <input
+                name="imageFile"
+                type="file"
+                onChange={(e) => {
+                  handleChange(e);
+                  setUploadImage(e.currentTarget.files[0]);
+                  handleImageChange(e);
+                }}
+              />
             </Box>
             <Box display="flex" justifyContent="start" mt="20px">
               <Button

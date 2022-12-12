@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
-import { Box, Typography, useTheme, Button } from "@mui/material";
+import { useNavigate, useLocation } from "react-router-dom";
+import { Box, Typography, useTheme, Button, TextField} from "@mui/material";
 import { DataGrid, GridToolbar } from "@mui/x-data-grid";
 import { tokens } from "../../theme";
 import AdminPanelSettingsOutlinedIcon from "@mui/icons-material/AdminPanelSettingsOutlined";
@@ -8,69 +8,84 @@ import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
 import SwipeableTemporaryDrawer from "./ViewItemDrawer";
-import { getAllExercisesAsync, toggleExerciseAsync } from "../../services/exercisesServices";
+import { getAllCategoriesAsync, getAllExercisesAsync, toggleExerciseAsync } from "../../services/exercisesServices";
 import UpdateExerciseForm from "./update";
+import Popup from 'reactjs-popup';
+import { Field, Formik } from "formik";
+import * as yup from "yup";
+import useMediaQuery from "@mui/material/useMediaQuery";
+import { createSessionAsync, deleteSessionAsync, getSessionDetailAsync } from "../../services/sessionsService";
+import { useAlert } from 'react-alert';
+import useAuth from "../../hooks/useAuth";
 
 
-const Exercises = () => {
+const userSchema = yup.object().shape({
+  sessionName: yup.string().required("Session Name is required"),
+});
+
+const SessionDetail = () => {
+  let location = useLocation();
+
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [viewItemData, setViewItemData] = useState({});
   const [pageSize, setPageSize] = useState(10);
-  const [listExercises, setListExercises] = useState({});
   const [visibleItemDrawer, setVisibleItemDrawer] = useState(false);
-  const [updateItemData, setUpdateViewItemData] = useState({});
-  const [visibleUpdateDrawer, setVisibleUpdateDrawer] = useState(false);
   const [activeRows, setActiveRows] = useState({});
+
+  let sessionId = location.state.sessionId;
+  let sessionName = location.state.sessionName;
 
   let navigate = useNavigate();
 
-  const getExercises = async () => {
+  const { auth } = useAuth();
 
-    const exercises = await getAllExercisesAsync();
-    // console.log(exercises);
-    // console.log(exercises.data);
-    if (exercises.data) {
-      setListExercises(exercises.data);
-      const rows = exercises.data
-        .map((item, i) => {
-          return {
-            ...item,
-            rowIndex: i + 1, //use rowIndex as column
-          };
-        });
-      setActiveRows(rows);
-      //console.log(activeRows);
+  const isNonMobile = useMediaQuery("(min-width:600px)");
+
+  const alert = useAlert();
+
+  const getExercises = async () => {
+    const details = await getSessionDetailAsync(sessionId);
+    const categories = await getAllCategoriesAsync();
+
+    const rows = details.data.map((item, i) => {
+      const temp = item.exercise;
+      const cate = categories.data.find((cate) => {return cate.categoryId === temp.categoryId});
+      console.log(cate);
+      return {
+        ...temp,
+        categoryName: cate.catgegoryName,
+        rowIndex: i + 1,
+      };
+    });
+    console.log(rows);
+    setActiveRows(rows);
+  };
+  
+  const handleDeleteSession = async () => {
+    const result = await deleteSessionAsync(sessionId);
+    if (result.data.success) {
+      alert.success("Session Deleted Successfully!");
+      navigate("/sessions");
+    } else {
+      alert.error("Session Delete Failed!");
     }
   };
 
-  // const getActiveRows = () => {
-  //   const patients = listPatients;
-  //   const rows = patients.filter(function (row) {
-  //     return row.status === true;
-  //   });
-  //   setActiveRows(rows);
-  // };
-
-  const toggleStatus = async (row) => {
-    //console.log(row.userId);
-    const status = !row.status;
-    //console.log(status);
-    await toggleExerciseAsync(row.exerciseId, status);
-    getExercises();
-  }
-
-  useEffect(() => {
-
-  }, [activeRows]);
+  useEffect(() => {}, [activeRows]);
 
   useEffect(() => {
     getExercises();
-    // getActiveRows();
   }, []);
 
   const columns = [
-    { field: "rowIndex", headerName: "No.", flex: 0.3,  align: "center", headerAlign: "center"},
+    {
+      field: "rowIndex",
+      headerName: "No.",
+      flex: 0.3,
+      align: "center",
+      headerAlign: "center",
+    },
     {
       field: "exerciseName",
       headerName: "Name",
@@ -105,26 +120,11 @@ const Exercises = () => {
           setViewItemData(currentRow);
           setVisibleItemDrawer(true);
         };
-        const handleToggle = (e) => {
-          const currentRow = params.row;
-          console.log(currentRow);
-          toggleStatus(currentRow);
-        };
-        const handleUpdate = (e) => {
-          const currentRow = params.row;
-
-          navigate("/editExercise", {
-            state: {
-              exerciseId: currentRow.exerciseId,
-              exerciseName: currentRow.exerciseName,
-              videoLink: currentRow.videoLink,
-              description: currentRow.description,
-              categoryName: currentRow.categoryName,
-              image: currentRow.exerciseImage,
-            },
-          });
-
-        };
+        // const handleRemove = (e) => {
+        //   const currentRow = params.row;
+        //   console.log(currentRow);
+        //   removeExercise(currentRow);
+        // };
         return (
           <Box display="flex" alignItems="center" gap="15px">
             <Box
@@ -137,7 +137,9 @@ const Exercises = () => {
               borderRadius="4px"
               alignContent="center"
             >
-
+              {/* <Typography color={colors.grey[100]} sx={{ ml: "5px" }}>
+                        View
+                      </Typography> */}
               <Button
                 onClick={handleView}
                 color="secondary"
@@ -145,49 +147,6 @@ const Exercises = () => {
                 size="small"
               >
                 View
-              </Button>
-            </Box>
-
-            <Box
-              width="60%"
-              m="0 auto"
-              p="0px"
-              display="flex"
-              justifyContent="center"
-              backgroundColor={colors.redAccent[600]}
-              borderRadius="4px"
-              alignContent="center"
-            >
-              <Button
-                onClick={handleToggle}
-                style={{
-                  backgroundColor: "#C60000",
-                }}
-                variant="contained"
-                size="small"
-              >
-                Delete
-              </Button>
-            </Box>
-            <Box
-              width="60%"
-              m="0 auto"
-              p="0px"
-              display="flex"
-              justifyContent="center"
-              backgroundColor={colors.redAccent[600]}
-              borderRadius="4px"
-              alignContent="center"
-            >
-              <Button
-                onClick={handleUpdate}
-                style={{
-                  backgroundColor: "#055CED",
-                }}
-                variant="contained"
-                size="small"
-              >
-                Update
               </Button>
             </Box>
           </Box>
@@ -199,18 +158,23 @@ const Exercises = () => {
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="EXERCISEES" subtitle="Managing the exercises" />
+        <Header
+          title="SESSION DETAIL"
+          subtitle={sessionName}
+        />
+
         <Button
           onClick={() => {
-            navigate("/createExercise");
+            handleDeleteSession();
+            navigate("/createSession");
           }}
           style={{
-            backgroundColor: "#055CED",
+            backgroundColor: "#C60000",
           }}
           variant="contained"
           size="large"
         >
-          Create New Exercise
+          Delele Session
         </Button>
       </Box>
       <Box
@@ -252,7 +216,7 @@ const Exercises = () => {
           pagination
           rows={activeRows}
           columns={columns.concat(actionColumn)}
-          getRowId={(row) => row.exerciseId}
+          getRowId={(row) => row.rowIndex}
           components={{ Toolbar: GridToolbar }}
         />
       </Box>
@@ -268,4 +232,4 @@ const Exercises = () => {
   );
 };
 
-export default Exercises;
+export default SessionDetail;

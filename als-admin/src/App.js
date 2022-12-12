@@ -22,6 +22,17 @@ import CreateStaffForm from "./scenes/staff/create";
 import Staffs from "./scenes/staff";
 import Records from "./scenes/records";
 import CreateRecordForm from "./scenes/records/create";
+import Sessions from "./scenes/sessions";
+import CreateSession from "./scenes/sessions/create";
+import CreatingSession from "./scenes/sessions/creatingSession";
+import AlertTemplate from "react-alert-template-basic";
+import { positions, transitions, Provider } from "react-alert";
+import SessionDetail from "./scenes/sessions/detail";
+
+const options = {
+  timeout: 3000,
+  transition: transitions.FADE,
+};
 
 function App() {
   const [theme, colorMode] = useMode();
@@ -30,50 +41,64 @@ function App() {
     <ColorModeContext.Provider value={colorMode}>
       <ThemeProvider theme={theme}>
         <CssBaseline />
-        <Routes>
-          <Route path="/login" element={<Login />} />
-          <Route
-            element={<RequireAuth allowedRoles={[ADMIN_ROLE, STAFF_ROLE]} />}
-          >
-            <Route path="/" element={<Layout />}>
-              <Route path="/unauthorized" element={<Unauthorized />} />
-              {/* <Route path="/dashboard" element={<Dashboard />} /> */}
+        <Provider template={AlertTemplate} {...options}>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route
+              element={<RequireAuth allowedRoles={[ADMIN_ROLE, STAFF_ROLE]} />}
+            >
+              <Route path="/" element={<Layout />}>
+                <Route path="/unauthorized" element={<Unauthorized />} />
+                {/* <Route path="/dashboard" element={<Dashboard />} /> */}
 
-              {/* EXERCISES ROUTES */}
-              <Route path="/exercises" element={<Exercises />} />
-              <Route path="/editExercise" element={<UpdateExerciseForm />} />
-              <Route path="/createExercise" element={<CreateExerciseForm />} />
+                {/* EXERCISES ROUTES */}
+                <Route path="/exercises" element={<Exercises />} />
+                <Route path="/editExercise" element={<UpdateExerciseForm />} />
+                <Route
+                  path="/createExercise"
+                  element={<CreateExerciseForm />}
+                />
 
-              {/* ARTICLES ROUTES */}
-              <Route path="/articles" element={<Articles />} />
-              <Route path="/editArticle" element={<UpdateArticleForm />} />
-              <Route path="/createArticle" element={<CreateArticleForm />} />
+                {/* ARTICLES ROUTES */}
+                <Route path="/articles" element={<Articles />} />
+                <Route path="/editArticle" element={<UpdateArticleForm />} />
+                <Route path="/createArticle" element={<CreateArticleForm />} />
 
-              {/* POSTS ROUTES */}
-              <Route path="/posts" element={<Posts />} />
-              <Route path="/editArticle" element={<UpdateArticleForm />} />
-              <Route path="/createArticle" element={<CreateArticleForm />} />
+                {/* POSTS ROUTES */}
+                <Route path="/posts" element={<Posts />} />
+                <Route path="/editArticle" element={<UpdateArticleForm />} />
+                <Route path="/createArticle" element={<CreateArticleForm />} />
 
-              <Route element={<RequireAuth allowedRoles={[ADMIN_ROLE]} />}>
-                {/* PATIENT ROUTES */}
-                <Route path="/patients">
-                  <Route index element={<Patients />} />
+                <Route element={<RequireAuth allowedRoles={[ADMIN_ROLE]} />}>
+                  {/* PATIENT ROUTES */}
+                  <Route path="/patients">
+                    <Route index element={<Patients />} />
+                  </Route>
+
+                  {/* SUPPORTERS_ROUTES */}
+                  <Route path="/supporters" element={<Supporters />} />
+
+                  {/* STAFF ROUTES */}
+                  <Route path="/createStaff" element={<CreateStaffForm />} />
+                  <Route path="/staffs" element={<Staffs />} />
+
+                  {/* RECORDS ROUTES */}
+                  <Route path="/records" element={<Records />} />
+                  <Route path="/createRecord" element={<CreateRecordForm />} />
+
+                  {/* SESSIONS ROUTES */}
+                  <Route path="/sessions" element={<Sessions />} />
+                  <Route path="/createSession" element={<CreateSession />} />
+                  <Route
+                    path="/creatingSession"
+                    element={<CreatingSession />}
+                  />
+                  <Route path="/sessionDetail" element={<SessionDetail />} />
                 </Route>
-
-                {/* SUPPORTERS_ROUTES */}
-                <Route path="/supporters" element={<Supporters />} />
-
-                {/* STAFF ROUTES */}
-                <Route path="/createStaff" element={<CreateStaffForm />} />
-                <Route path="/staffs" element={<Staffs />} />
-
-                {/* RECORDS ROUTES */}
-                <Route path="/records" element={<Records />} />
-                <Route path="/createRecord" element={<CreateRecordForm />} />
               </Route>
             </Route>
-          </Route>
-        </Routes>
+          </Routes>
+        </Provider>
       </ThemeProvider>
     </ColorModeContext.Provider>
   );

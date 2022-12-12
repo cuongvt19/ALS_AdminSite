@@ -31,5 +31,6 @@ export const updateExerciseAsync = async (exercise) => {
 
 export const createExerciseAsync = async (exercise) => {
     // console.log(CREATE_EXERCISE_URL);
+    console.log(exercise);
     return await axios.post(CREATE_EXERCISE_URL, exercise);
 }

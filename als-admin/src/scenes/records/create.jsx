@@ -15,8 +15,8 @@ import useAuth from "../../hooks/useAuth";
 // import AudioConverter from "convert-audio";
 
 const userSchema = yup.object().shape({
-  textValue: yup.string().required("Title is required"),
-  recordName: yup.string().required("Image is required"),
+  textValue: yup.string().required("Content is required"),
+  recordName: yup.string().required("Record Name is required"),
 });
 
 const CreateRecordForm = () => {

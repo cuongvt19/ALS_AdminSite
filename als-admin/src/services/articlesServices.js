@@ -1,6 +1,7 @@
 import axios from "./axios";
 
 const GET_ARTICLES_URL = '/News/GetAllNews/';
+const GET_ARTICLES_CATEGORIES_URL = '/categoryNew/GetAllCategoryNew';
 const DELETE_ARTICLE_URL = '/News/UpdateNewsStatus?newsId=';
 const UPDATE_ARTICLE_URL = '/News/UpdateNews';
 const CREATE_ARTICLE_URL = '/News/CreateNewNews';
@@ -9,6 +10,11 @@ const CREATE_ARTICLE_URL = '/News/CreateNewNews';
 export const getAllArticlesAsync = async () => {
     return await axios.get(GET_ARTICLES_URL);
 }
+
+export const getAllArticlesCategoriesAsync = async () => {
+    return await axios.get(GET_ARTICLES_CATEGORIES_URL);
+}
+
 
 export const deleteArticleAsync = async (articleId, status) => {
     // console.log(articleId);
@@ -25,6 +31,5 @@ export const updateArticleAsync = async (article) => {
 
 export const createArticleAsync = async (article) => {
     // console.log(CREATE_EXERCISE_URL);
-    console.log(article);
     return await axios.post(CREATE_ARTICLE_URL, article);
 }

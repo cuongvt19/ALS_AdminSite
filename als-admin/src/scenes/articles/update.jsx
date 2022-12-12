@@ -16,7 +16,6 @@ import { v4 } from "uuid";
 
 const userSchema = yup.object().shape({
   title: yup.string().required("Title is required"),
-  // image: yup.string().required("Image is required"),
   description: yup.string().required("Description is required"),
 });
 
@@ -43,7 +42,6 @@ const UpdateArticleForm = () => {
 
     const handleFormSubmit = async (values) => {
       if (uploadImage != null) {
-        console.log(values);
         const fileName = uploadImage.name.substring(
           0,
           uploadImage.name.lastIndexOf(".")
@@ -102,16 +100,6 @@ const UpdateArticleForm = () => {
         };
         reader.readAsDataURL(event.target.files[0]);
       }
-      // console.log(changeImage);
-      // if (changeImage !== image) {
-      //   setImageState(changeImage);
-      //   image = changeImage;
-      // }
-      // setImageState(changeImage);
-      // setUploadImage(changeImage);
-      // image = changeImage;
-      // console.log(imageState);
-      // console.log(image);
     }
 
     useEffect(() => {
@@ -195,23 +183,6 @@ const UpdateArticleForm = () => {
                   helperText={touched.title && errors.title}
                   sx={{ gridColumn: "span 4" }}
                 />
-                {/* <TextField
-                  fullWidth
-                  inputProps={{ style: { fontSize: 20 } }}
-                  variant="filled"
-                  type="text"
-                  label="Image Link"
-                  onBlur={handleBlur}
-                  onChange={(e) => {
-                    handleChange(e);
-                    handleImageChange(e.currentTarget.value);
-                  }}
-                  value={values.image}
-                  name="image"
-                  error={!!touched.image && !!errors.image}
-                  helperText={touched.image && errors.image}
-                  sx={{ gridColumn: "span 4" }}
-                /> */}
                 <TextField
                   multiline
                   fullWidth

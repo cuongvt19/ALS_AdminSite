@@ -5,7 +5,7 @@ import { Field, Formik } from "formik";
 import * as yup from "yup";
 import useMediaQuery from "@mui/material/useMediaQuery";
 import Header from "../../components/Header";
-import { createArticleAsync } from "../../services/articlesServices";
+import { createArticleAsync, getAllArticlesCategoriesAsync } from "../../services/articlesServices";
 import { storage } from "../../firebase";
 import { ref, getDownloadURL, uploadBytes } from "firebase/storage";
 import { v4 } from "uuid";
@@ -19,17 +19,12 @@ const userSchema = yup.object().shape({
 const CreateArticleForm = () => {
 
     let navigate = useNavigate();
-   
-    // let newsId = location.state.newsId;
-    // let title = location.state.title;
-    // let image = location.state.image;
-    // let description = location.state.description;
-    // let status = location.state.status;
-    // let lastModifyBy = auth?.userId;
 
     const [isSuccess, setIsSuccess] = useState();
     const [imageState, setImageState] = useState();
     const [uploadImage, setUploadImage] = useState();
+    const [categories, setCategories] = useState([]);
+    const [iniCategoryId, setInitCategoryId] = useState();
 
     const isNonMobile = useMediaQuery("(min-width:600px)");
 
@@ -51,20 +46,19 @@ const CreateArticleForm = () => {
           console.log(values);
           console.log(imageUrl);
           const requestBody = {
-            image: url,
+            image: imageUrl,
             accessId: 3,
-            ...values,
+            title: values.title,
+            description: values.description,
+            categoryNewId: values.categoryNewId,
+            newsDetails: [],
           };
           console.log(requestBody);
           const response = await createArticleAsync(requestBody);
+          console.log(response);
           setIsSuccess(response.data.success);
         });
       });
-      // console.log(values);
-      // const requestBody = { values };
-      // console.log(requestBody);
-      // const response = await createArticleAsync(requestBody);
-      // setIsSuccess(response.data.success);
     };
 
     const alertCloseHandle = () => {
@@ -76,18 +70,27 @@ const CreateArticleForm = () => {
       if (event.target.files && event.target.files[0]) {
         let reader = new FileReader();
         reader.onload = (e) => {
-          // this.setState({image: e.target.result});
           setImageState(e.target.result);
         };
         reader.readAsDataURL(event.target.files[0]);
       }
-    }
-    useEffect(() => {
-      // console.log(imageState);
-    }, [imageState])
+    };
 
-    useEffect(() =>  {
-      // setImageState(image);
+    const getCategories = async () => {
+      const response = await getAllArticlesCategoriesAsync();
+      setCategories(response.data);
+    };
+
+    useEffect(() => {}, [imageState]);
+
+    useEffect(() => {
+      if(categories.length > 0) {
+        setInitCategoryId(categories[0].categoryNewId);
+      }
+    }, [categories]);
+
+    useEffect(() => {
+      getCategories();
     }, []);
 
     return (
@@ -120,6 +123,7 @@ const CreateArticleForm = () => {
           initialValues={{
             title: "",
             description: "",
+            categoryNewId: iniCategoryId ?? "",
           }}
           validationSchema={userSchema}
         >
@@ -189,16 +193,24 @@ const CreateArticleForm = () => {
                   helperText={touched.description && errors.description}
                   sx={{ gridColumn: "span 4" }}
                 />
+
+                <Field as="select" name="categoryNewId" fullWidth>
+                  {categories.map((cat) => (
+                    <option value={cat.categoryNewId}>{cat.categoryName}</option>
+                  ))}
+                </Field>
+
+                <input
+                  name="imageFile"
+                  type="file"
+                  onChange={(e) => {
+                    handleChange(e);
+                    setUploadImage(e.currentTarget.files[0]);
+                    handleImageChange(e);
+                  }}
+                />
               </Box>
-              <input
-                name="imageFile"
-                type="file"
-                onChange={(e) => {
-                  handleChange(e);
-                  setUploadImage(e.currentTarget.files[0]);
-                  handleImageChange(e);
-                }}
-              />
+
               <Box display="flex" justifyContent="start" mt="20px">
                 <Button
                   type="submit"

@@ -8,34 +8,39 @@ import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
 import SwipeableTemporaryDrawer from "./ViewItemDrawer";
-import { getAllPostAsync, togglePostStatusAsync } from "../../services/postsServices";
+import {
+  getAllArticlesAsync,
+  deleteArticleAsync,
+} from "../../services/articlesServices";
+import { deleteSessionAsync, getAllSessionAsync } from "../../services/sessionsService";
 import useAuth from "../../hooks/useAuth";
-// import UpdateExerciseForm from "./update";
+import { useAlert } from 'react-alert';
 
 
-const Posts = () => {
+const Sessions = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [viewItemData, setViewItemData] = useState({});
   const [pageSize, setPageSize] = useState(10);
-  const [listPosts, setListPosts] = useState({});
+  const [listSessions, setListSessions] = useState({});
   const [visibleItemDrawer, setVisibleItemDrawer] = useState(false);
   const [updateItemData, setUpdateViewItemData] = useState({});
   const [visibleUpdateDrawer, setVisibleUpdateDrawer] = useState(false);
   const [activeRows, setActiveRows] = useState({});
 
-  const { auth } = useAuth();
+  const {auth} = useAuth();
+  const alert = useAlert();
 
   let navigate = useNavigate();
 
-  let userId = auth?.userId;
+  const getSessions = async () => {
 
-  const getPosts = async () => {
-
-    const posts = await getAllPostAsync(userId);
-    if (posts.data) {
-      setListPosts(posts.data);
-      const rows = posts.data
+    const sessions = await getAllSessionAsync(auth.userId);
+    // console.log(sessions);
+    // console.log(sessions.data);
+    if (sessions.data) {
+      setListSessions(sessions.data);
+      const rows = sessions.data
         .map((item, i) => {
           return {
             ...item,
@@ -55,77 +60,38 @@ const Posts = () => {
   //   setActiveRows(rows);
   // };
 
-  const toggleStatus = async (row) => {
-    //console.log(row.userId);
-    const post = {
-      status: !row.isPublic,
-      postId: row.postId,
+  const deleteSession = async (row) => {
+    const result = await deleteSessionAsync(row.sessionId);
+    if (result.data.success) {
+      alert.success("Session Deleted Successfully!");
+      getSessions();
+    } else {
+      alert.error("Session Delete Failed!");
     }
-    console.log(post);
-    await togglePostStatusAsync(post);
-    getPosts();
   }
-
-//   useEffect(() => {
-//     if (Object.keys(viewItemData).length > 0) {
-//       setVisibleItemDrawer(true);
-//       // console.log(viewItemData);
-//     }
-//   }, [viewItemData]);
 
   useEffect(() => {
 
   }, [activeRows]);
 
   useEffect(() => {
-    getPosts();
-    // getActiveRows();
+    getSessions();
   }, []);
 
   const columns = [
     { field: "rowIndex", headerName: "No.", flex: 0.3,  align: "center", headerAlign: "center"},
     {
-      field: "postId",
-      headerName: "PostId",
-      flex: 1,
+      field: "sesionName",
+      headerName: "Name",
+      flex: 0.7,
       cellClassName: "name-column--cell",
     },
-    // {
-    //   field: "dateOfBirth",
-    //   headerName: "Date of birth",
-    //   type: "dateTime",
-    //   headerAlign: "left",
-    //   align: "left",
-    //   flex: 1,
-    // },
     {
-      field: "createDate",
+      field: "createAt",
       type: "dateTime",
       headerName: "Created Date",
-      flex: 1,
+      flex: 0.5,
     },
-    {
-      field: "fullNameUser",
-      headerName: "Post By",
-      cellClassName: "name-column--cell",
-      flex: 1,
-    },
-    // {
-    //   field: "isPublic",
-    //   headerName: "Is Public?",
-    //   flex: 0.5,
-    // },
-    {
-      field: "countReact",
-      headerName: "Reacts Count",
-      flex: 0.3,
-    },
-    
-    // {
-    //   field: "address",
-    //   headerName: "Address",
-    //   flex: 1,
-    // },
   ];
 
   const actionColumn = [
@@ -136,28 +102,17 @@ const Posts = () => {
       renderCell: (params) => {
         const handleView = (e) => {
           const currentRow = params.row;
-          setViewItemData(currentRow);
-          setVisibleItemDrawer(true);
-        };
-        const handleToggle = (e) => {
-          const currentRow = params.row;
           console.log(currentRow);
-          toggleStatus(currentRow);
-        };
-        const handleUpdate = (e) => {
-          const currentRow = params.row;
-          console.log(currentRow.categoryName);
-
-          navigate("/editArticle", {
+          navigate("/sessionDetail", {
             state: {
-              newsId: currentRow.newsId,
-              title: currentRow.title,
-              image: currentRow.image,
-              description: currentRow.description,
-              status: currentRow.status,
+              sessionId: currentRow.sessionId,
+              sessionName: currentRow.sesionName,
             },
           });
-
+        };
+        const handleDeleteSession = (e) => {
+          const currentRow = params.row;
+          deleteSession(currentRow);
         };
         return (
           <Box display="flex" alignItems="center" gap="15px">
@@ -204,9 +159,8 @@ const Posts = () => {
               alignContent="center"
             >
               <Button
-                onClick={handleToggle}
+                onClick={handleDeleteSession}
                 style={{
-                  // backgroundColor: "#F3C628",
                   backgroundColor: "#C60000",
                 }}
                 variant="contained"
@@ -215,27 +169,6 @@ const Posts = () => {
                 Delete
               </Button>
             </Box>
-            {/* <Box
-              width="60%"
-              m="0 auto"
-              p="0px"
-              display="flex"
-              justifyContent="center"
-              backgroundColor={colors.redAccent[600]}
-              borderRadius="4px"
-              alignContent="center"
-            >
-              <Button
-                onClick={handleUpdate}
-                style={{
-                  backgroundColor: "#055CED",
-                }}
-                variant="contained"
-                size="small"
-              >
-                Update
-              </Button>
-            </Box> */}
           </Box>
         );
       },
@@ -246,7 +179,19 @@ const Posts = () => {
     //<Header title="PATIENTS" subtitle="Managing the ALS patients" />
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="POSTS" subtitle="Managing the posts by all users" />
+        <Header title="SESSIONS" subtitle="Managing the sessions" />
+        <Button
+          onClick={() => {
+            navigate("/createSession");
+          }}
+          style={{
+            backgroundColor: "#055CED",
+          }}
+          variant="contained"
+          size="large"
+        >
+          Create New Session
+        </Button>
       </Box>
       <Box
         m="40px 0 0 0"
@@ -287,7 +232,7 @@ const Posts = () => {
           pagination
           rows={activeRows}
           columns={columns.concat(actionColumn)}
-          getRowId={(row) => row.postId}
+          getRowId={(row) => row.sessionId}
           components={{ Toolbar: GridToolbar }}
           // pagination
           // pageSize={10}
@@ -305,4 +250,4 @@ const Posts = () => {
   );
 };
 
-export default Posts;
+export default Sessions;

@@ -8,34 +8,33 @@ import LockOpenOutlinedIcon from "@mui/icons-material/LockOpenOutlined";
 import SecurityOutlinedIcon from "@mui/icons-material/SecurityOutlined";
 import Header from "../../components/Header";
 import SwipeableTemporaryDrawer from "./ViewItemDrawer";
-import { getAllPostAsync, togglePostStatusAsync } from "../../services/postsServices";
-import useAuth from "../../hooks/useAuth";
-// import UpdateExerciseForm from "./update";
+import { getAllExercisesAsync, toggleExerciseAsync } from "../../services/exercisesServices";
+import UpdateExerciseForm from "./update";
+import { useAlert } from 'react-alert'
 
 
-const Posts = () => {
+const CreateSession = () => {
   const theme = useTheme();
   const colors = tokens(theme.palette.mode);
   const [viewItemData, setViewItemData] = useState({});
   const [pageSize, setPageSize] = useState(10);
-  const [listPosts, setListPosts] = useState({});
+  const [listExercises, setListExercises] = useState({});
   const [visibleItemDrawer, setVisibleItemDrawer] = useState(false);
   const [updateItemData, setUpdateViewItemData] = useState({});
   const [visibleUpdateDrawer, setVisibleUpdateDrawer] = useState(false);
   const [activeRows, setActiveRows] = useState({});
 
-  const { auth } = useAuth();
-
   let navigate = useNavigate();
 
-  let userId = auth?.userId;
+  const alert = useAlert();
 
-  const getPosts = async () => {
+  const getExercises = async () => {
 
-    const posts = await getAllPostAsync(userId);
-    if (posts.data) {
-      setListPosts(posts.data);
-      const rows = posts.data
+    const exercises = await getAllExercisesAsync();
+
+    if (exercises.data) {
+      setListExercises(exercises.data);
+      const rows = exercises.data
         .map((item, i) => {
           return {
             ...item,
@@ -43,50 +42,22 @@ const Posts = () => {
           };
         });
       setActiveRows(rows);
-      //console.log(activeRows);
     }
   };
-
-  // const getActiveRows = () => {
-  //   const patients = listPatients;
-  //   const rows = patients.filter(function (row) {
-  //     return row.status === true;
-  //   });
-  //   setActiveRows(rows);
-  // };
-
-  const toggleStatus = async (row) => {
-    //console.log(row.userId);
-    const post = {
-      status: !row.isPublic,
-      postId: row.postId,
-    }
-    console.log(post);
-    await togglePostStatusAsync(post);
-    getPosts();
-  }
-
-//   useEffect(() => {
-//     if (Object.keys(viewItemData).length > 0) {
-//       setVisibleItemDrawer(true);
-//       // console.log(viewItemData);
-//     }
-//   }, [viewItemData]);
 
   useEffect(() => {
 
   }, [activeRows]);
 
   useEffect(() => {
-    getPosts();
-    // getActiveRows();
+    getExercises();
   }, []);
 
   const columns = [
     { field: "rowIndex", headerName: "No.", flex: 0.3,  align: "center", headerAlign: "center"},
     {
-      field: "postId",
-      headerName: "PostId",
+      field: "exerciseName",
+      headerName: "Name",
       flex: 1,
       cellClassName: "name-column--cell",
     },
@@ -99,28 +70,20 @@ const Posts = () => {
     //   flex: 1,
     // },
     {
-      field: "createDate",
-      type: "dateTime",
-      headerName: "Created Date",
+      field: "categoryName",
+      headerName: "Category",
       flex: 1,
     },
     {
-      field: "fullNameUser",
-      headerName: "Post By",
-      cellClassName: "name-column--cell",
+      field: "exerciseLevel",
+      headerName: "Difficulty",
       flex: 1,
     },
     // {
-    //   field: "isPublic",
-    //   headerName: "Is Public?",
+    //   field: "status",
+    //   headerName: "Active",
     //   flex: 0.5,
     // },
-    {
-      field: "countReact",
-      headerName: "Reacts Count",
-      flex: 0.3,
-    },
-    
     // {
     //   field: "address",
     //   headerName: "Address",
@@ -139,25 +102,16 @@ const Posts = () => {
           setViewItemData(currentRow);
           setVisibleItemDrawer(true);
         };
-        const handleToggle = (e) => {
+        const handleAddToSession = (e) => {
           const currentRow = params.row;
-          console.log(currentRow);
-          toggleStatus(currentRow);
-        };
-        const handleUpdate = (e) => {
-          const currentRow = params.row;
-          console.log(currentRow.categoryName);
-
-          navigate("/editArticle", {
-            state: {
-              newsId: currentRow.newsId,
-              title: currentRow.title,
-              image: currentRow.image,
-              description: currentRow.description,
-              status: currentRow.status,
-            },
-          });
-
+          var exercises = JSON.parse(sessionStorage.getItem("creatingSession"));
+          if(exercises == null) {
+            exercises = [];
+            exercises.push(currentRow);
+          } else {
+            exercises.push(currentRow);
+          }
+          sessionStorage.setItem("creatingSession", JSON.stringify(exercises));
         };
         return (
           <Box display="flex" alignItems="center" gap="15px">
@@ -183,16 +137,6 @@ const Posts = () => {
                 View
               </Button>
             </Box>
-            {/* <Box display="flex" justifyContent="center" mt="20px">
-                      <Button
-                        type="submit"
-                        color="secondary"
-                        variant="contained"
-                        size="small"
-                      >
-                        View
-                      </Button>
-                    </Box> */}
             <Box
               width="60%"
               m="0 auto"
@@ -204,38 +148,19 @@ const Posts = () => {
               alignContent="center"
             >
               <Button
-                onClick={handleToggle}
-                style={{
-                  // backgroundColor: "#F3C628",
-                  backgroundColor: "#C60000",
+                onClick={() => {
+                  handleAddToSession();
+                  alert.success("Added To Session");
                 }}
-                variant="contained"
-                size="small"
-              >
-                Delete
-              </Button>
-            </Box>
-            {/* <Box
-              width="60%"
-              m="0 auto"
-              p="0px"
-              display="flex"
-              justifyContent="center"
-              backgroundColor={colors.redAccent[600]}
-              borderRadius="4px"
-              alignContent="center"
-            >
-              <Button
-                onClick={handleUpdate}
                 style={{
                   backgroundColor: "#055CED",
                 }}
                 variant="contained"
                 size="small"
               >
-                Update
+                Add To Session
               </Button>
-            </Box> */}
+            </Box>
           </Box>
         );
       },
@@ -246,7 +171,20 @@ const Posts = () => {
     //<Header title="PATIENTS" subtitle="Managing the ALS patients" />
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="POSTS" subtitle="Managing the posts by all users" />
+        <Header title="SESSION CREATE" subtitle="Select exercises to create a session" />
+        <Button
+          onClick={() => {
+            navigate("/creatingSession");
+            // sessionStorage.clear();
+          }}
+          style={{
+            backgroundColor: "#055CED",
+          }}
+          variant="contained"
+          size="large"
+        >
+          Current Session
+        </Button>
       </Box>
       <Box
         m="40px 0 0 0"
@@ -287,7 +225,7 @@ const Posts = () => {
           pagination
           rows={activeRows}
           columns={columns.concat(actionColumn)}
-          getRowId={(row) => row.postId}
+          getRowId={(row) => row.exerciseId}
           components={{ Toolbar: GridToolbar }}
           // pagination
           // pageSize={10}
@@ -301,8 +239,16 @@ const Posts = () => {
           onClose={() => setVisibleItemDrawer(false)}
         />
       )}
+
+      {/* {visibleUpdateDrawer && (
+        <UpdateExerciseForm
+          // visible={visibleUpdateDrawer}
+          initData={updateItemData}
+          onClose={() => setVisibleItemDrawer(false)}
+        />
+      )} */}
     </Box>
   );
 };
 
-export default Posts;
+export default CreateSession;

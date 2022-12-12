@@ -16,6 +16,7 @@ import FitbitOutlinedIcon from '@mui/icons-material/FitbitOutlined';
 import NoteAltOutlinedIcon from '@mui/icons-material/NoteAltOutlined';
 import GroupOutlinedIcon from '@mui/icons-material/GroupOutlined';
 import KeyboardVoiceOutlinedIcon from '@mui/icons-material/KeyboardVoiceOutlined';
+import EventRepeatOutlinedIcon from '@mui/icons-material/EventRepeatOutlined';
 //import "react-pro-sidebar/dist/scss/styles.css"
 //import "react-pro-sidebar/dist/styles/globalStyles";
 import "react-pro-sidebar/dist/css/styles.css";
@@ -182,6 +183,13 @@ const AppSidebar = () => {
               title="Articles"
               to="/articles"
               icon={<ArticleOutlinedIcon fontSize="large"/>}
+              selected={selected}
+              setSelected={setSelected}
+            />
+            <Item
+              title="Sessions"
+              to="/sessions"
+              icon={<EventRepeatOutlinedIcon fontSize="large"/>}
               selected={selected}
               setSelected={setSelected}
             />
