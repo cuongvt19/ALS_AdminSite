@@ -237,7 +237,7 @@ const Articles = () => {
     //<Header title="PATIENTS" subtitle="Managing the ALS patients" />
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="ARTICLES" subtitle="Managing the aticles" />
+        <Header title="ARTICLES" subtitle="Managing aticles" />
         <Button
           onClick={() => {
             navigate("/createArticle");

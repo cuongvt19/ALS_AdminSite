@@ -216,7 +216,7 @@ const Patients = () => {
     //<Header title="PATIENTS" subtitle="Managing the ALS patients" />
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="PATIENTS" subtitle="Managing the ALS patients" />
+        <Header title="PATIENTS" subtitle="Managing ALS patients" />
       </Box>
       <Box
         m="40px 0 0 0"

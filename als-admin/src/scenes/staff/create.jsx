@@ -68,7 +68,7 @@ const CreateStaffForm = () => {
           Create Successfully!
         </Alert>
       )}
-      <Header title="CREATE USER" subtitle="Create a New User Profile" />
+      <Header title="REGISTER STAFF" subtitle="Register a New Staff Account" />
 
       <Formik
         onSubmit={handleFormSubmit}
@@ -168,7 +168,7 @@ const CreateStaffForm = () => {
                 variant="contained"
                 size="large"
               >
-                Create New User
+                Register
               </Button>
             </Box>
           </form>

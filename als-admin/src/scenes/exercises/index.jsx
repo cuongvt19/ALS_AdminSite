@@ -199,7 +199,7 @@ const Exercises = () => {
   return (
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="EXERCISEES" subtitle="Managing the exercises" />
+        <Header title="EXERCISEES" subtitle="Managing exercises" />
         <Button
           onClick={() => {
             navigate("/createExercise");

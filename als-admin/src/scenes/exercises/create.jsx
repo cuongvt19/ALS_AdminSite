@@ -57,6 +57,7 @@ const CreateExerciseForm = () => {
           videoLink: values.videoLink,
           description: values.description,
           categoryId: values.categoryId,
+          exerciseLevel: values.exerciseLevel,
         };
         console.log(requestBody);
         const response = await createExerciseAsync(requestBody);

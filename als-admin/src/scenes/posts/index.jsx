@@ -246,7 +246,7 @@ const Posts = () => {
     //<Header title="PATIENTS" subtitle="Managing the ALS patients" />
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="POSTS" subtitle="Managing the posts by all users" />
+        <Header title="POSTS" subtitle="Managing posts by all users" />
       </Box>
       <Box
         m="40px 0 0 0"

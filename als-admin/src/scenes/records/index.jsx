@@ -194,7 +194,7 @@ const Records = () => {
       <Box display="flex" justifyContent="space-between" alignItems="center">
         <Header
           title="RECORDS"
-          subtitle="Managing the voice records created by Admin"
+          subtitle="Managing voice records created by Admin"
         />
         <Button
           onClick={() => {

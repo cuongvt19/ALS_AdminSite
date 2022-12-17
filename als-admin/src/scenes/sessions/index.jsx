@@ -179,7 +179,7 @@ const Sessions = () => {
     //<Header title="PATIENTS" subtitle="Managing the ALS patients" />
     <Box m="20px">
       <Box display="flex" justifyContent="space-between" alignItems="center">
-        <Header title="SESSIONS" subtitle="Managing the sessions" />
+        <Header title="SESSIONS" subtitle="Managing sessions" />
         <Button
           onClick={() => {
             navigate("/createSession");
